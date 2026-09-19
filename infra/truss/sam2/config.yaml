@@ -31,8 +31,11 @@ resources:
   accelerator: L4
 
 # Bakes the weights into the image so cold starts don't re-download ~900MB.
+# (use_volume:true is a newer Baseten feature with its own required fields --
+# volume_folder, a pinned revision, etc. -- not worth the complexity here.)
 model_cache:
   - repo_id: facebook/sam2.1-hiera-large
+    use_volume: false
     allow_patterns:
       - "*.pt"
       - "*.yaml"

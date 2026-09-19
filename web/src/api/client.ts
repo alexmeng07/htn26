@@ -3,6 +3,13 @@ import type { LeaderboardEntry, RoundResult, ScenePack } from './types'
 // Vite proxies /api to the FastAPI server (see vite.config.ts).
 const BASE = '/api'
 
+/**
+ * Scene media (isolated video, cue audio, masks) comes back from /scene as a
+ * server-rooted path like "/media/<scene>/isolated.mp4". Prefix it so the
+ * browser goes through the same proxy as the rest of the API.
+ */
+export const mediaUrl = (path: string) => (path ? `${BASE}${path}` : '')
+
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
   return res.json() as Promise<T>

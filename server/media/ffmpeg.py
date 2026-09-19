@@ -50,6 +50,17 @@ def extract_audio(src: Path, dst: Path) -> Path:
     return dst
 
 
+def video_size(src: Path) -> tuple[int, int]:
+    """(width, height) in pixels. Used to validate prompts against the clip."""
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x", str(src)],
+        check=True, capture_output=True, text=True,
+    )
+    width, height = out.stdout.strip().split("x")
+    return int(width), int(height)
+
+
 def duration_s(src: Path) -> float:
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",

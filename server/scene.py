@@ -88,6 +88,37 @@ def load_config(scene_id: str) -> SceneConfig:
     return SceneConfig(**yaml.safe_load(path.read_text(encoding="utf-8")))
 
 
+def _attach_generated_media(pack: ScenePack, scene_id: str) -> ScenePack:
+    """Point the pack at whatever Scene Prep has produced so far.
+
+    Prep runs in stages, so the app has to work with a half-built scene: after
+    `prep.isolate_client` there is an isolated video to play even though the
+    reference sheet and pack.json don't exist yet. Paths are URLs under /media,
+    which server/main.py serves from the scenes directory.
+    """
+    folder = scene_dir(scene_id)
+    if not pack.isolated_video and (folder / "isolated.mp4").exists():
+        pack.isolated_video = f"/media/{scene_id}/isolated.mp4"
+    if not pack.cue_audio and (folder / "trimmed.mp4").exists():
+        # The trimmed clip carries the scene's own audio, which is the player's
+        # cue track until a dedicated audio export exists.
+        pack.cue_audio = f"/media/{scene_id}/trimmed.mp4"
+    if not pack.masks_dir and (folder / "masks" / "masks.json").exists():
+        pack.masks_dir = f"/media/{scene_id}/masks/masks.json"
+    if not pack.duration_s:
+        source = folder / "isolated.mp4"
+        if not source.exists():
+            source = folder / "trimmed.mp4"
+        if source.exists():
+            from server.media.ffmpeg import duration_s
+
+            try:
+                pack.duration_s = duration_s(source)
+            except Exception:  # noqa: BLE001 - a missing ffprobe must not break /scene
+                pass
+    return pack
+
+
 def load_pack(scene_id: str | None = None) -> ScenePack:
     """Load the active scene pack.
 
@@ -98,8 +129,10 @@ def load_pack(scene_id: str | None = None) -> ScenePack:
     scene_id = scene_id or settings.active_scene
     pack_path = scene_dir(scene_id) / "pack.json"
     if pack_path.exists():
-        return ScenePack(**json.loads(pack_path.read_text(encoding="utf-8")))
-    return ScenePack(**load_config(scene_id).model_dump())
+        pack = ScenePack(**json.loads(pack_path.read_text(encoding="utf-8")))
+    else:
+        pack = ScenePack(**load_config(scene_id).model_dump())
+    return _attach_generated_media(pack, scene_id)
 
 
 def save_pack(pack: ScenePack) -> Path:

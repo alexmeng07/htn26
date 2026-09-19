@@ -23,6 +23,7 @@ import typer
 
 from server.config import get_settings
 from server.media.ffmpeg import run as ffmpeg_run
+from server.media.ffmpeg import video_size
 from server.scene import load_config, scene_dir
 
 app = typer.Typer(add_completion=False)
@@ -66,6 +67,27 @@ def main(
         raise typer.BadParameter(
             f"scenes/{scene}/scene.yaml has no character_select. Run with --pick first."
         )
+
+    # The prompt is in the TRIMMED clip's pixel space, since that's the video
+    # SAM 2 receives. Reading coordinates off the source clip instead is an easy
+    # mistake that otherwise fails silently as a garbage mask -- catch it here.
+    width, height = video_size(trimmed)
+    if select.box:
+        x1, y1, x2, y2 = select.box
+        if not (0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height):
+            raise typer.BadParameter(
+                f"character_select.box {select.box} doesn't fit the trimmed clip "
+                f"({width}x{height}). Coordinates must be in the TRIMMED clip's pixel "
+                "space -- run with --pick and read them off first_frame.png."
+            )
+    else:
+        x, y = select.point
+        if not (0 <= x < width and 0 <= y < height):
+            raise typer.BadParameter(
+                f"character_select.point {select.point} falls outside the trimmed clip "
+                f"({width}x{height}). Run with --pick and read coordinates off "
+                "first_frame.png."
+            )
 
     url = endpoint or settings.sam2_endpoint_url
     if not url:

@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager, suppress
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
 from server.config import get_settings
@@ -51,6 +52,12 @@ _results: dict[str, RoundResult] = {}
 
 async def publish(event: RoundEvent) -> None:
     await _streams[event.round_id].put(event)
+
+
+# Scene media: the isolated character video, cue audio and masks that Scene
+# Prep writes into scenes/<scene_id>/. Served straight off disk so the demo
+# keeps working with the Wi-Fi off.
+app.mount("/media", StaticFiles(directory=settings.scenes_path), name="media")
 
 
 @app.get("/health")

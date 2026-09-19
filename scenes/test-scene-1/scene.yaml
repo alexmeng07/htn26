@@ -1,0 +1,41 @@
+# First real test scene.
+#
+# CONFIRM THESE: movie_title / character_name / actor_name are my best guess
+# from watching the frames. They only affect display text and the OMNI prompt,
+# so correcting them is a one-line edit + `make prep SCENE=test-scene-1`.
+
+scene_id: test-scene-1
+movie_title: "The Bear"
+character_name: "Carmy"
+actor_name: "Jeremy Allen White"
+
+clip_file: assets/private/test-scene-1/raw.mp4
+start: "00:00:00"
+end: "00:00:10.400"
+
+# Tight close-up: he fills most of the frame, so the box is generous.
+# Coords are in the TRIMMED clip's pixel space (1280x720) -- that's what SAM 2
+# receives, and what `--pick` exports first_frame.png from.
+character_select:
+  box: [227, 0, 1160, 720]
+
+briefing: "A quiet confession, barely above a murmur. All of it lives in the face."
+tip: "Barely move. This one is in the eyes and the jaw."
+title_line: "Can you out-act Jeremy Allen White?"
+
+# He's delivering dialogue, not just reacting -- score the words and timing.
+voice_mode: lines
+
+# No other characters speak over him, so headphones are optional here.
+other_voices_in_audio: false
+
+# It's a head-and-shoulders close-up: there is almost no body to score, so the
+# body threshold is deliberately forgiving. Face carries the round.
+thresholds:
+  face: 70
+  body: 45
+  voice: 65
+
+dub_voice_style: "raspy, tired, quiet intensity, young American male"
+
+source_note: "Team-supplied test clip. Local hackathon demo use only; not committed to the repo."
