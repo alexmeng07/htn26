@@ -1,7 +1,6 @@
 # ---- Copyrighted / large media: NEVER commit ----
 assets/private/*
 !assets/private/README.md
-*.mp4
 *.mov
 *.mkv
 *.webm
