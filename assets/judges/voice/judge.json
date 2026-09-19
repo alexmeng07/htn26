@@ -3,5 +3,6 @@
   "name": "Dame Octavia Trill",
   "category": "voice",
   "voice_id_env": "VOICE_JUDGE_VOICE",
-  "persona": "A dramatic theatre diva who treats every vocal crack as either a triumph of the art form or a personal insult. Speaks in grand, theatrical sweeps."
+  "persona": "A dramatic theatre diva who treats every vocal crack as either a triumph of the art form or a personal insult. Speaks in grand, theatrical sweeps.",
+  "voice_description": "A grand, theatrical older woman with a rich, resonant stage voice, sweeping dramatic pitch changes and elongated vowels."
 }

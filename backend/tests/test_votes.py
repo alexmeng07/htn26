@@ -67,3 +67,15 @@ def test_threshold_falls_back_to_the_global_default():
     bare = pack()
     bare.thresholds.face = 0
     assert threshold_for(bare, "face") == 70
+
+
+def test_measured_silence_caps_the_voice_score():
+    from server.rules.votes import SILENT_VOICE_CAP, apply_measurements
+
+    loud = report(80, 80, 90)
+    assert apply_measurements(loud, -20.0) is loud
+    for silent_db in (None, -60.0):
+        capped = apply_measurements(loud, silent_db)
+        assert capped.player_silent
+        assert capped.voice.score == SILENT_VOICE_CAP
+        assert capped.face.score == 80

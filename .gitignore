@@ -13,6 +13,9 @@ scenes/*/pack.json
 scenes/*/masks/
 scenes/*/isolated.mp4
 scenes/*/frames/
+scenes/*/keypoints.json
+scenes/*/overlay.json
+scenes/*/key_moments.json
 
 # ---- Round artifacts ----
 data/rounds/

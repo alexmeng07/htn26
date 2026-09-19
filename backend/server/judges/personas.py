@@ -14,6 +14,8 @@ from pydantic import BaseModel
 from server.config import get_settings
 from server.schemas import Category
 
+CATEGORY_ORDER: tuple[Category, ...] = ("face", "body", "voice")
+
 
 class Persona(BaseModel):
     judge_id: str
@@ -21,6 +23,7 @@ class Persona(BaseModel):
     category: Category
     voice_id_env: str  # e.g. VOICE_JUDGE_FACE -- the ID itself stays in .env
     persona: str  # one line, fed to the OpenAI prompt
+    voice_description: str = ""  # ElevenLabs Voice Design prompt -- designed, never cloned
 
 
 def load_personas() -> list[Persona]:
@@ -30,4 +33,5 @@ def load_personas() -> list[Persona]:
         personas.append(Persona(**json.loads(meta.read_text(encoding="utf-8"))))
     if not personas:
         raise FileNotFoundError(f"No judge.json files under {root}")
-    return personas
+    # Stage order, left to right: face, body, voice.
+    return sorted(personas, key=lambda p: CATEGORY_ORDER.index(p.category))

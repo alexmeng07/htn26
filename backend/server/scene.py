@@ -14,6 +14,7 @@ import yaml
 from pydantic import BaseModel, Field
 
 from server.config import get_settings
+from server.schemas import KeypointTimeline
 
 
 class Thresholds(BaseModel):
@@ -67,6 +68,7 @@ class ScenePack(SceneConfig):
     cue_audio: str = ""
     subtitles: str = ""
     masks_dir: str = ""
+    overlay: str = ""  # the character's skeleton points, drawn during the take
     duration_s: float = 0.0
     key_moments: list[KeyMoment] = Field(default_factory=list)
     dub_voice_id: str = ""
@@ -103,6 +105,11 @@ def _attach_generated_media(pack: ScenePack, scene_id: str) -> ScenePack:
         # The trimmed clip carries the scene's own audio, which is the player's
         # cue track until a dedicated audio export exists.
         pack.cue_audio = f"/media/{scene_id}/trimmed.mp4"
+    if not pack.key_moments and (folder / "key_moments.json").exists():
+        moments = json.loads((folder / "key_moments.json").read_text(encoding="utf-8"))
+        pack.key_moments = [KeyMoment(**m) for m in moments]
+    if not pack.overlay and (folder / "overlay.json").exists():
+        pack.overlay = f"/media/{scene_id}/overlay.json"
     if not pack.masks_dir and (folder / "masks" / "masks.json").exists():
         pack.masks_dir = f"/media/{scene_id}/masks/masks.json"
     if not pack.duration_s:
@@ -133,6 +140,14 @@ def load_pack(scene_id: str | None = None) -> ScenePack:
     else:
         pack = ScenePack(**load_config(scene_id).model_dump())
     return _attach_generated_media(pack, scene_id)
+
+
+def reference_keypoints(scene_id: str) -> KeypointTimeline | None:
+    """The character's pose + expression timeline from prep, or None before prep ran."""
+    path = scene_dir(scene_id) / "keypoints.json"
+    if not path.exists():
+        return None
+    return KeypointTimeline.model_validate_json(path.read_text(encoding="utf-8"))
 
 
 def save_pack(pack: ScenePack) -> Path:

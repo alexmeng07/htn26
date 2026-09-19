@@ -23,10 +23,31 @@ export interface ScenePack {
   other_voices_in_audio: boolean
   thresholds: { face: number; body: number; voice: number }
   isolated_video: string
+  overlay: string // URL of the character's skeleton points for the take ('' before prep)
   cue_audio: string
   subtitles: string
   duration_s: number
   key_moments: KeyMoment[]
+}
+
+/** Mirrors KeypointTimeline in server/schemas.py: the browser's side of grading. */
+export interface PoseLandmark {
+  x: number
+  y: number
+  z: number
+  visibility: number
+}
+
+export interface KeypointSample {
+  t: number // seconds since the take started, on the recording clock
+  pose: PoseLandmark[] // 33 points, or empty when no person was found
+  face: Record<string, number> // blendshape name -> 0..1
+}
+
+export interface KeypointTimeline {
+  fps: number
+  aspect: number // frame width / height
+  samples: KeypointSample[]
 }
 
 export interface MomentNote {
@@ -47,6 +68,13 @@ export interface JudgeResult {
   audio_url: string | null
 }
 
+/** A judge still deciding (the voice judge while the voice is scored). */
+export interface JudgeStub {
+  judge_id: string
+  name: string
+  category: Category
+}
+
 export interface RoundResult {
   round_id: string
   nickname: string
@@ -62,7 +90,12 @@ export interface RoundResult {
   passed: boolean
   golden_buzzer: boolean
   dub_url: string | null
+  /** The player's skeleton on the replay; null if the replay is the side-by-side. */
+  replay_overlay: string | null
   fallback_used: boolean
+  /** false: face and body are in and can be revealed; `pending` is still coming. */
+  complete: boolean
+  pending: JudgeStub[]
 }
 
 export interface LeaderboardEntry {

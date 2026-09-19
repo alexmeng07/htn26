@@ -4,6 +4,7 @@ import { api } from './api/client'
 import { useGame } from './store/game'
 import Title from './screens/Title'
 import Briefing from './screens/Briefing'
+import Watch from './screens/Watch'
 import Ready from './screens/Ready'
 import Perform from './screens/Perform'
 import Deliberation from './screens/Deliberation'
@@ -15,6 +16,7 @@ import Leaderboard from './screens/Leaderboard'
 const SCREENS = {
   title: Title,
   briefing: Briefing,
+  watch: Watch,
   ready: Ready,
   perform: Perform,
   deliberation: Deliberation,

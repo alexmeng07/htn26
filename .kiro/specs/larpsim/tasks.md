@@ -126,14 +126,14 @@ place — move the I/O to Phase 3.
   - `.kiro/scripts/setup-grading.ps1`, `.kiro/scripts/_probe_landmarkers.py`
   - **Design risk #1 is retired**; the browser-side reference-extraction fallback is not needed
   - _Requirements: R6.4_
-- [~] 2.2 Add keypoint timeline models to `server/schemas.py`: one sample = timestamp in seconds since
+- [x] 2.2 Add keypoint timeline models to `server/schemas.py`: one sample = timestamp in seconds since
       take start, 33 pose landmarks each with `x, y, z, visibility`, and the face blendshape
       coefficients as a name→float map. A timeline is an ordered list of samples plus the source fps
   - **Not:** do not add a new report type and do not change `ComparisonReport`, `CategoryScore`,
     `JudgeVote`, `Verdict`, or `RoundResult`. Grading's output *is* the existing `ComparisonReport`,
     so the voice path and the grading path stay interchangeable. Additions only (**I7**)
   - _Requirements: R5.5, R6.4, I7_
-- [~] 2.3 Determine the **comparison scope** per reference frame: the set of pose landmarks whose
+- [x] 2.3 Determine the **comparison scope** per reference frame: the set of pose landmarks whose
       `visibility` clears a threshold (default 0.5, tune in 6.7). This set, taken from the
       *reference*, is the only thing graded in that frame
   - Parts the reference does not show are excluded. Parts the player shows but the reference does not
@@ -143,7 +143,7 @@ place — move the I/O to Phase 3.
     player could shrink the scope by leaving frame, stepping out of shot would become a way to raise
     the score. The scope is a property of the scene, identical for every player and every attempt
   - _Requirements: R6.7_
-- [~] 2.4 Derive the scope's measures, each carrying a confidence equal to the minimum `visibility` of
+- [x] 2.4 Derive the scope's measures, each carrying a confidence equal to the minimum `visibility` of
       its contributing landmarks. Full-body scope: elbow, shoulder, hip, knee, neck and torso-lean
       angles. Head-and-shoulders scope: shoulder-line roll, neck flexion, head yaw from ear/nose
       offsets, head roll, shoulder-to-head distance, torso lean where any torso shows, and
@@ -157,7 +157,7 @@ place — move the I/O to Phase 3.
     than of performance. Do not compare raw landmark coordinates, pixel distances, or bounding boxes
     anywhere in the scoring path
   - _Requirements: R6.2, R6.7, R6.15_
-- [~] 2.5 Score pose similarity over the scope: confidence-weighted mean absolute difference across its
+- [x] 2.5 Score pose similarity over the scope: confidence-weighted mean absolute difference across its
       measures, mapped to 0–100 by `100 * (1 - error / MAX_ERROR)` clamped to `[0, 100]`, with
       `MAX_ERROR = 60°` (default, tune in 6.7) as one named constant
   - **Not:** do not call any model, local or remote, in this function. Face and body scores are
@@ -172,7 +172,7 @@ place — move the I/O to Phase 3.
     a different distance to score the same; a baked-in distance penalty reintroduces exactly the
     failure scale invariance exists to prevent
   - _Requirements: R6.2, R6.14_
-- [~] 2.7 Score facial similarity from blendshape coefficients, weighting expressive channels above
+- [x] 2.7 Score facial similarity from blendshape coefficients, weighting expressive channels above
       incidental ones: brow (`brow*`), eye squint (`eyeSquint*`), jaw (`jaw*`), and mouth
       (`mouth*`) at weight 1.0; blinks (`eyeBlink*`) and gaze direction (`eyeLook*`) at weight 0.1
       (defaults, tune in 6.7), since a blink or a glance is timing noise, not acting
@@ -180,13 +180,13 @@ place — move the I/O to Phase 3.
     positions encode face shape, so a different face making the identical expression would score
     badly (R6.3)
   - _Requirements: R6.1, R6.3_
-- [~] 2.8 Align in time with a tolerance window: for each reference sample, score against the
+- [x] 2.8 Align in time with a tolerance window: for each reference sample, score against the
       best-matching player sample within ±250 ms (default, tune in 6.7) rather than requiring exact
       frame alignment. One named constant, used by both face and body
   - **Not:** do not attempt global time-warping or drift correction. R5.1 starts the clip and the
       recorder on the same tick, so the only error to absorb is jitter
   - _Requirements: R6.5_
-- [~] 2.9 Aggregate into a `ComparisonReport`: drop reference samples with no detection, weight samples
+- [x] 2.9 Aggregate into a `ComparisonReport`: drop reference samples with no detection, weight samples
       within ±250 ms of a key moment at 3× (default, tune in 6.7), emit the per-moment notes, and set
       `best_moment` and `worst_moment` to the highest- and lowest-scoring key moments
   - Set `player_not_visible` when fewer than 60% of player samples contain a detected person; set
@@ -195,7 +195,7 @@ place — move the I/O to Phase 3.
     is not a player failure, and scoring it as one would punish the player for the film's editing
     (R6.8)
   - _Requirements: R6.6, R6.8, R6.9, R6.10, R6.11_
-- [~] 2.10 Unit-test comparison against hand-built synthetic timelines: identical (expect 100),
+- [x] 2.10 Unit-test comparison against hand-built synthetic timelines: identical (expect 100),
       mirrored, uniformly scaled (expect near-identical to the unscaled case, proving R6.2),
       time-shifted inside the tolerance (expect near-identical) and outside it, partially visible,
       and empty
@@ -207,12 +207,12 @@ place — move the I/O to Phase 3.
     landmarker detects anything in it; synthetic timelines are stronger evidence and keep every unit
     test free of copyrighted media (**I5**, decision D1 tier 2)
   - _Requirements: R3.4, R6.2, R6.3, R6.7, R6.12_
-- [~] 2.11 Assert determinism: the same timelines and pack scored twice produce byte-identical face and
+- [x] 2.11 Assert determinism: the same timelines and pack scored twice produce byte-identical face and
       body scores, across at least 5 repeats
   - Also record the wall-clock time for a 10.4 s take: it must be a small fraction of the 8 s round
     budget and must involve no network call (R6.13)
   - _Requirements: R6.12, R6.13, I3_
-- [~] 2.12 Expose `POST /grade/compare`: two keypoint timelines plus a scene id in, a
+- [x] 2.12 Expose `POST /grade/compare`: two keypoint timelines plus a scene id in, a
       `ComparisonReport` out, so the lane is drivable with curl before any camera exists
   - **Not:** do not put scoring logic in the route. It calls the same function `round/pipeline.py`
     calls, so the standalone path cannot drift from the composed one
@@ -222,27 +222,35 @@ place — move the I/O to Phase 3.
 
 ## Phase 3 — Keypoint extraction and prep (~2 h) · P0 · Lane A
 
-- [~] 3.1 Extract reference pose and face over the trimmed clip in Python, cached as a discrete prep
+- [x] 3.1 Extract reference pose and face over the trimmed clip in Python, cached as a discrete prep
       artifact so re-running prep skips it
   - _Requirements: R4.6, R4.2_
-- [~] 3.2 Sample the player live in the browser during the take, timestamped against the same clock
+- [x] 3.2 Sample the player live in the browser during the take, timestamped against the same clock
       as the recording, and upload the timeline with the take
   - **Not:** do not timestamp from `Date.now()` or wall clock. It must be the recording clock, or
     sample *t* stops meaning reference *t* and the whole alignment assumption (R5.1) collapses
+  - **Amended 2026-09-19:** the clock is the *character video's* `currentTime`, not the recorder's
+    elapsed time. Found in the parity check (3.4): playback stalled ~0.5 s over a 10.4 s clip, so
+    elapsed-time stamps drifted off the reference and the same clip scored face 40 / body 53. The
+    player copies what they see, so the video's own position is the true shared clock. After the
+    change: 96 / 97, stable over 3 runs
   - _Requirements: R5.4, R5.5_
-- [~] 3.3 Implement server-side player extraction as the fallback when the browser cannot sample,
+- [x] 3.3 Implement server-side player extraction as the fallback when the browser cannot sample,
       calling the same comparison code as the browser path
   - _Requirements: R5.8_
-- [~] 3.4 Parity-test Python and browser extraction on the same input: same model files, same
+- [x] 3.4 Parity-test Python and browser extraction on the same input: same model files, same
       normalisation, and a resulting category score within 2 points on the 0–100 scale
   - **Not:** do not let the two paths use different model versions or different normalisation. The
     models are pinned at v1 in `assets/models/` for exactly this reason (R6.4)
+  - Verified 2026-09-19 (manual, in Chrome): the reference clip sampled in the browser (GPU delegate,
+    full frame) grades 96 face / 97 body against the Python reference (CPU, cropped); the Python
+    server path on the same clip grades 95 / 97. Within 2 points. Not yet an automated test
   - _Requirements: R6.4_
-- [~] 3.5 Select 6–10 key moments from the keypoint timeline by largest pose or expression change,
+- [x] 3.5 Select 6–10 key moments from the keypoint timeline by largest pose or expression change,
       spread across the clip; when the duration supports fewer than 6, take what it supports and warn
   - **Not:** do not fail prep on a short clip, and do not pad with evenly spaced filler moments
   - _Requirements: R4.7, R4.8_
-- [~] 3.6 Resolve the clip tolerantly: the configured filename first, then the single video file in the
+- [x] 3.6 Resolve the clip tolerantly: the configured filename first, then the single video file in the
       scene's private directory if the configured name is absent, printing loudly that it substituted.
       When nothing is found, fail immediately naming the exact expected path and any near misses
   - _Requirements: R4.4, R4.5_
@@ -255,7 +263,7 @@ place — move the I/O to Phase 3.
   - **Not:** do not write it over `assets/private/test-scene-1/test_clip_1.mp4` — the real clip is now
     there. Do not use it to validate grading quality; it contains no human to detect
   - _Requirements: R4.3, D1_
-- [~] 3.8 Build the reference sheet with one multimodal call for the whole clip, cached so re-running
+- [x] 3.8 Build the reference sheet with one multimodal call for the whole clip, cached so re-running
       prep does not repeat it; on failure write empty prose and continue
   - **Not:** do not call per key moment, and do not fail prep when the call fails. The sheet gives the
     judges quotable specifics; its absence costs flavour, not a round
@@ -265,14 +273,14 @@ place — move the I/O to Phase 3.
   - **Not:** do not let an unreachable MongoDB fail prep or fail a round. It warns and mirrors locally
     (R4.12, R14.3)
   - _Requirements: R4.11, R4.12, R14.1, R14.2, R14.3_
-- [~] 3.10 Assemble the pack: validate against the scene-pack model, record duration and a prepared-at
+- [x] 3.10 Assemble the pack: validate against the scene-pack model, record duration and a prepared-at
       stamp, upsert. Run the segmentation stage last and treat failure as non-fatal
   - **Not:** do not make any scored field depend on segmentation output. Masks feed the replay overlay
     only, and a segmentation failure cannot change a verdict (**I9**)
   - _Requirements: R4.1, R4.11, R4.14, I9_
-- [~] 3.11 Run prep end to end on the fixture scene; confirm `GET /scene` serves the resulting pack
+- [x] 3.11 Run prep end to end on the fixture scene; confirm `GET /scene` serves the resulting pack
   - _Requirements: R4.1_
-- [~] 3.12 Run prep on `assets/private/test-scene-1/test_clip_1.mp4` (present as of 2026-09-19) and
+- [x] 3.12 Run prep on `assets/private/test-scene-1/test_clip_1.mp4` (present as of 2026-09-19) and
       confirm extraction finds a person in the `[227, 0, 1160, 720]` region across the 10.4 s, and
       that the selected key moments land on visible expression changes
   - This is the first time grading meets real footage; it is the checkpoint for grading quality
@@ -287,7 +295,7 @@ place — move the I/O to Phase 3.
       Record the working payload shapes and the measured latencies
   - **Not:** do not build against a guessed payload shape. Confirm the wire format first
   - _Requirements: R7.2, R9.1, R10.1, R14.1_
-- [~] 4.2 Implement the voice comparison in `compare/omni.py`: build the side-by-side video — character
+- [x] 4.2 Implement the voice comparison in `compare/omni.py`: build the side-by-side video — character
       left, player right, frame-synced, carrying the player's audio only — then one multimodal call
       that receives the pack's reference sheet, validate the reply against `ComparisonReport`, retry
       once on malformed output, abandon and fall back past an 8 s budget, and switch between
@@ -298,7 +306,7 @@ place — move the I/O to Phase 3.
     destroy determinism (**I3**, R7.9). Do not exceed one call per round; the credit cap is 40 CAD.
     Do not put the scene audio on the side-by-side track — the player's microphone only
   - _Requirements: R7.1, R7.2, R7.3, R7.4, R7.5, R7.6, R7.7, R7.8_
-- [~] 4.3 Implement the local voice estimate used when the model is unavailable: derive a 0–100 score
+- [x] 4.3 Implement the local voice estimate used when the model is unavailable: derive a 0–100 score
       from the take's own audio envelope — voiced ratio, energy variance, and timing against the key
       moments — with no network
   - **Not:** do not return a fixed number or a random one. A constant makes every fallback round
@@ -310,7 +318,7 @@ place — move the I/O to Phase 3.
   - **Not:** do not ask the model to decide or revise a vote, and do not send it the raw thresholds to
     reason about. Code decides; the model only reacts to what it is handed (**I2**)
   - _Requirements: R9.1, R9.2, R9.3, R9.4, R9.5, R9.6_
-- [~] 4.5 Write and commit pre-written lines for every judge × vote × band, and implement selection as
+- [x] 4.5 Write and commit pre-written lines for every judge × vote × band, and implement selection as
       a pure tested function. Bands: NO far-below (score < threshold − 15), NO near-miss
       (≥ threshold − 15), YES pass (< 90), YES golden (≥ 90, matching `GOLDEN_BUZZER_SCORE`) — 3
       judges × 4 bands = 12 lines minimum, in `assets/fallback/`
@@ -318,22 +326,22 @@ place — move the I/O to Phase 3.
   - **Not:** do not generate these at runtime. They exist so a dead network still produces a show
     (**I6**)
   - _Requirements: R9.7, R9.8, R15.3_
-- [~] 4.6 Synthesise speech with the first judge awaited and judges two and three generated
+- [x] 4.6 Synthesise speech with the first judge awaited and judges two and three generated
       concurrently, so the reveal can start before all three are ready
   - When synthesis fails, the verdict still plays from speech bubbles plus the cached sound effects
     from 4.8 (R10.5, R15.4)
   - **Not:** do not block the reveal on all three voices, and do not let a synthesis failure abort the
     verdict. The show is degraded silently, never cancelled
   - _Requirements: R10.1, R10.2, R10.5, R15.4_
-- [~] 4.7 Design the three judge voices from text descriptions, store the IDs in `.env`, and confirm
+- [x] 4.7 Design the three judge voices from text descriptions, store the IDs in `.env`, and confirm
       `GET /health` reports no missing credentials
   - **Not:** do not clone the actor's voice or any real person's voice. Designed from description
     only (**I4**)
   - _Requirements: R10.3, R10.6, I4_
-- [~] 4.8 Generate the sound-effect set once — drumroll, YES, NO, applause, golden buzzer — and cache
+- [x] 4.8 Generate the sound-effect set once — drumroll, YES, NO, applause, golden buzzer — and cache
       it in `assets/sfx/` so playback needs no further calls
   - _Requirements: R10.4_
-- [~] 4.9 Implement `round/pipeline.py` in this order: grading first (local, no network), then
+- [x] 4.9 Implement `round/pipeline.py` in this order: grading first (local, no network), then
       side-by-side, voice, tally, lines, speech. Log per-stage timing. Delete the raw take when
       `DELETE_TAKES_AFTER_SCORING` is set and the replay was not kept
   - Any unrecoverable stage failure emits an `error` event so the stream always terminates (R11.7)
@@ -341,7 +349,7 @@ place — move the I/O to Phase 3.
     yields real face and body scores, which is what makes the offline round (**I6**) more than a
     stub. Do not let a failure leave the SSE stream open with the client spinning
   - _Requirements: R11.1, R11.2, R11.4, R11.5, R11.7, R11.8_
-- [~] 4.10 Accept the take plus its keypoint timeline on `POST /rounds/{id}/take` (currently 501),
+- [x] 4.10 Accept the take plus its keypoint timeline on `POST /rounds/{id}/take` (currently 501),
       return promptly, run the pipeline in the background, and add the static mounts for round audio
       and judge assets
   - Close the client half too: recording stops when the character video ends and the take uploads
@@ -357,13 +365,17 @@ place — move the I/O to Phase 3.
 - [~] 4.12 Play one real round end to end and record the measured wait from take-end to first judge
       speaking; target ≤ 8 s, the span the deliberation animation covers
   - **Not:** do not assume the timing. R11.4 asks for a measured number written down
+  - Measured 2026-09-19, one live round, server-side keypoints: take-end -> verdict 23.5 s
+    (grading 4.6, side-by-side 0.8, OMNI voice 11.5, lines 6.2 [OpenAI out of credits], voices 0.3).
+    Since then: side-by-side cut to 360p/10fps (OMNI 10.8 s -> 7.1 s, same score); browser
+    keypoints remove the 4.6 s. Expected ~10 s -- still over the 8 s target; OMNI is the floor
   - _Requirements: R11.4_
 
 ---
 
 ## Phase 5 — The show (~2 h) · P0 · Lane B
 
-- [~] 5.1 Generate placeholder judge sprites and document the drop-in contract: `assets/judges/<id>/`
+- [x] 5.1 Generate placeholder judge sprites and document the drop-in contract: `assets/judges/<id>/`
       holding `idle.png`, `talking.png`, `yes.png`, `no.png`, all transparent PNG at one shared canvas
       size (512×512), plus the existing `judge.json`
   - Done when: replacing the placeholder files with real art needs no code change (R12.4)
@@ -378,13 +390,13 @@ place — move the I/O to Phase 3.
   - **Not:** do not let a denied permission dead-end the player or crash into the countdown. This is
     the single most likely failure when a stranger plays at a booth
   - _Requirements: R5.7_
-- [~] 5.4 Build `Deliberation`: dimmed stage, conferring sprites, drumroll, subscribed to the round
+- [x] 5.4 Build `Deliberation`: dimmed stage, conferring sprites, drumroll, subscribed to the round
       event stream
   - _Requirements: R12.1_
-- [~] 5.5 Build `Verdict`: judges revealed one at a time — talking animation, speech bubble, their
+- [x] 5.5 Build `Verdict`: judges revealed one at a time — talking animation, speech bubble, their
       audio, then the YES or NO image and its sound effect
   - _Requirements: R12.2_
-- [~] 5.6 Build `Result`: celebration on pass, the distinct golden-buzzer variant, and Try Again
+- [x] 5.6 Build `Result`: celebration on pass, the distinct golden-buzzer variant, and Try Again
       showing the tip from a judge who voted NO
   - _Requirements: R11.6, R12.5, R12.6_
 - [~] 5.7 Draw the live skeleton overlay during the performance
@@ -401,7 +413,7 @@ place — move the I/O to Phase 3.
 
 ## Phase 6 — Survive anything (~1.5 h) · P1
 
-- [~] 6.1 Wire `FORCE_FALLBACK` so one env var makes every external call take its local path, and a
+- [x] 6.1 Wire `FORCE_FALLBACK` so one env var makes every external call take its local path, and a
       complete round runs from local assets
   - **Not:** do not add a second switch or per-service flags. One switch, checked in one place per
     module
@@ -440,13 +452,16 @@ place — move the I/O to Phase 3.
 
 Dropped before anything above is weakened, and recorded here as dropped with a reason if so.
 
-- [~] 7.1 Produce the replay with the player's audio transformed into a voice designed from the pack's
+- [x] 7.1 Produce the replay with the player's audio transformed into a voice designed from the pack's
       `dub_voice_style`, generated in parallel with judging, emitting `dub_ready` on success or failure
   - **Not:** do not let replay work delay or block the verdict (R13.2)
   - _Requirements: R13.1, R13.2, R13.5_
-- [~] 7.2 Composite the player into the scene where masks exist, falling back to side-by-side
+- [x] 7.2 Composite the player into the scene where masks exist, falling back to side-by-side
+  - Done 2026-09-19: `server/media/composite.py`. Player cut out with the pose model's segmentation
+    mask (no per-round SAM 2), the character painted out of the frame (low-res inpaint), the player
+    fitted to the character's outline and colour-matched; ~17 s for 10.4 s, after the verdict
   - _Requirements: R13.3_
-- [~] 7.3 Build the `Dub` and `Leaderboard` screens, the leaderboard updating without a manual reload
+- [x] 7.3 Build the `Dub` and `Leaderboard` screens, the leaderboard updating without a manual reload
   - _Requirements: R13.5, R14.2, R14.4_
 - [~] 7.4 Correct `HANDOFF.md` where it contradicts this spec: the scene is chosen, grading is
       geometric rather than model-scored, and segmentation is cosmetic

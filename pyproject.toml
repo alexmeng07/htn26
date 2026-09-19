@@ -54,6 +54,9 @@ src = ["backend"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["server", "prep"]
+
 [tool.ruff.lint.per-file-ignores]
 # FastAPI's Depends/File/Form in argument defaults is the framework's idiom.
 "backend/server/main.py" = ["B008"]

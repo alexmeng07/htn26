@@ -16,9 +16,12 @@ export default function Title() {
       className="grid min-h-screen place-items-center px-6"
     >
       <div className="w-full max-w-md text-center">
-        <h1 className="text-5xl font-black tracking-tight text-spot">SceneStealer</h1>
-        {/* Title line comes from the scene pack, never from a literal here. */}
-        <p className="mt-3 text-lg text-white/70">{scene?.title_line ?? 'Loading scene…'}</p>
+        <h1 className="text-5xl font-black tracking-tight text-spot">LARPSim</h1>
+        {/* Deliberately generic: the scene is a surprise, revealed on Briefing.
+            Nothing here may name a film, character or actor -- clips rotate. */}
+        <p className="mt-3 text-lg text-white/70">
+          {scene ? 'One movie scene. One take. Three very honest judges.' : 'Loading scene…'}
+        </p>
 
         <input
           value={name}

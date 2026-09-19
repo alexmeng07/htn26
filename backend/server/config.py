@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     omni_api_key: str = ""
     omni_model: str = ""
     omni_model_dev: str = ""
+    # Develop on the flash model; flip to false only for the real demo (40 CAD cap).
+    omni_use_dev_model: bool = True
+    # Past this, the round falls back rather than keep the crowd waiting.
+    omni_timeout_s: float = 20.0
 
     # --- OpenAI (judge dialogue) ---
     openai_api_key: str = ""
@@ -59,6 +63,14 @@ class Settings(BaseSettings):
     force_fallback: bool = False
 
     # ---------------- derived paths ----------------
+    @property
+    def ffprobe_bin(self) -> str:
+        """ffprobe ships beside ffmpeg; derive it so FFMPEG_BIN can be a full path."""
+        ffmpeg = Path(self.ffmpeg_bin)
+        if ffmpeg.parent == Path("."):
+            return "ffprobe"
+        return str(ffmpeg.with_name(ffmpeg.name.replace("ffmpeg", "ffprobe")))
+
     @property
     def root(self) -> Path:
         return ROOT

@@ -1,0 +1,32 @@
+{
+  "face": {
+    "YES": [
+      {"spoken": "The eyes were doing the work. I'll allow it.", "bubble": "The eyes were doing the work. I've seen ten thousand of these and I'll allow it.", "tip": "Keep that stillness and let one micro-expression land a beat later."},
+      {"spoken": "Fine. Your face actually told a story. Yes.", "bubble": "Fine. Your face actually told a story, and I didn't have to squint for it. Yes.", "tip": "Hold the final expression a second longer before you break."}
+    ],
+    "NO": [
+      {"spoken": "Your face was on vacation. No.", "bubble": "Your face was on vacation for most of that scene. I needed eyes. I got wallpaper. No.", "tip": "Watch the eyes and brow on the left side, and copy one change at a time."},
+      {"spoken": "Too much eyebrow, not enough feeling. No.", "bubble": "Too much eyebrow, not enough feeling. Subtle is a word. Look it up. No.", "tip": "Do less. Pick the two biggest expression shifts and nail just those."}
+    ]
+  },
+  "body": {
+    "YES": [
+      {"spoken": "Shoulders! Hands! Posture! That's a YES from the booth!", "bubble": "Shoulders! Hands! Posture! Roll the replay, folks, that's a YES from the booth!", "tip": "Next time sell the biggest gesture even harder!"},
+      {"spoken": "You moved like you meant it! YES!", "bubble": "You moved like you meant it! That's championship posture right there! YES!", "tip": "Match the timing of the hand moves to the second and it's a highlight reel!"}
+    ],
+    "NO": [
+      {"spoken": "Stiff as a goalpost! That's a no from me!", "bubble": "Stiff as a goalpost out there! The body wasn't in the game! That's a no from me!", "tip": "Loosen the shoulders and copy the reference's big gestures, even if they feel silly!"},
+      {"spoken": "Where were the hands?! No!", "bubble": "Where were the hands?! The reference was talking with their whole body! No!", "tip": "Mirror the left side's posture changes, especially the hands and head!"}
+    ]
+  },
+  "voice": {
+    "YES": [
+      {"spoken": "Darling, that voice had a soul. Yes!", "bubble": "Darling, that voice had a soul, and for once I felt it in the balcony. Yes!", "tip": "Let the breath before the big moment be audible. Drama lives there."},
+      {"spoken": "A triumph of the vocal arts. Yes, yes, yes!", "bubble": "A triumph of the vocal arts! I may need a moment. Yes, yes, yes!", "tip": "Push the emotional break a touch further. The audience can take it."}
+    ],
+    "NO": [
+      {"spoken": "That voice was a personal insult. No.", "bubble": "That voice was a personal insult to everyone who has ever stood on a stage. No.", "tip": "Listen for where the reference breathes, cracks or goes quiet, and put yours there."},
+      {"spoken": "I've heard more emotion from a microwave. No.", "bubble": "I've heard more emotion from a microwave, darling. It beeped with more conviction. No.", "tip": "Speak up and let the feeling change your pitch. Flat is fatal."}
+    ]
+  }
+}
