@@ -240,7 +240,7 @@ export default function Verdict() {
       <button
         onClick={gaveUp ? () => go('result') : skip}
         className={`mt-8 rounded-lg px-5 py-2 text-sm ${
-          finished || gaveUp ? 'bg-spot font-bold text-stage-black' : 'bg-white/5 text-white/40'
+          finished || gaveUp ? 'cv-btn bg-spot font-bold text-stage-black' : 'cv-btn-quiet bg-white/5 text-white/50'
         }`}
       >
         {finished || gaveUp ? 'See your scores →' : 'Skip →'}

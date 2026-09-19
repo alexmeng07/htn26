@@ -77,7 +77,7 @@ export default function Ready() {
       <h2 className="text-2xl font-bold text-spot">Get in position</h2>
       <p className="mt-1 text-white/60">Frame yourself like the character: head and shoulders inside the guide.</p>
 
-      <div className="relative mt-4 aspect-video w-full max-w-3xl overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+      <div className="relative mt-4 aspect-video w-full max-w-3xl overflow-hidden cv-frame bg-black">
         <video ref={videoRef} className="h-full w-full -scale-x-100 object-cover" autoPlay playsInline muted />
         {check === 'ok' && (
           // Head-and-shoulders guide. Framing is a nudge here, never a score (R6.14).
@@ -94,7 +94,7 @@ export default function Ready() {
             <div>
               <p className="text-lg font-bold text-no">{HELP[check].title}</p>
               <p className="mt-2 max-w-md text-white/70">{HELP[check].body}</p>
-              <button onClick={ask} className="mt-4 rounded-lg bg-white/15 px-5 py-2 text-sm">
+              <button onClick={ask} className="mt-4 cv-btn-quiet bg-white/15 px-5 py-2 text-sm">
                 Try again
               </button>
             </div>
@@ -102,7 +102,7 @@ export default function Ready() {
         )}
       </div>
 
-      <label className="mt-5 flex max-w-3xl cursor-pointer items-start gap-3 rounded-xl bg-stage-deep p-4 ring-1 ring-white/10">
+      <label className="mt-5 flex max-w-3xl cursor-pointer items-start gap-3 cv-card p-4">
         <input
           type="checkbox"
           checked={headphones}
@@ -120,7 +120,7 @@ export default function Ready() {
       <button
         disabled={!canStart}
         onClick={() => go('perform')}
-        className="mt-6 rounded-lg bg-spot px-10 py-3 font-bold text-stage-black disabled:opacity-40"
+        className="mt-6 cv-btn bg-spot px-10 py-3 font-bold text-stage-black disabled:opacity-40"
       >
         {check === 'ok' && needsHeadphones && !headphones ? 'Headphones on to start' : 'Start — 3, 2, 1'}
       </button>

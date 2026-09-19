@@ -94,13 +94,13 @@ export default function Result() {
         )}
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <button onClick={retry} className="rounded-lg bg-spot px-5 py-2 font-bold text-stage-black">
+          <button onClick={retry} className="cv-btn bg-spot px-5 py-2 font-bold text-stage-black">
             Try again
           </button>
-          <button onClick={() => go('dub')} className="rounded-lg bg-white/10 px-5 py-2">
+          <button onClick={() => go('dub')} className="cv-btn-quiet bg-white/10 px-5 py-2">
             Watch the replay
           </button>
-          <button onClick={() => go('leaderboard')} className="rounded-lg bg-white/10 px-5 py-2">
+          <button onClick={() => go('leaderboard')} className="cv-btn-quiet bg-white/10 px-5 py-2">
             Leaderboard
           </button>
         </div>

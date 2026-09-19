@@ -84,7 +84,7 @@ export default function Dub() {
       className="flex min-h-screen flex-col items-center justify-center px-4 py-8"
     >
       <h2 className="mb-4 text-2xl font-bold text-spot">The replay</h2>
-      <div className="relative aspect-video w-full max-w-5xl overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+      <div className="relative aspect-video w-full max-w-5xl overflow-hidden cv-frame bg-black">
         {dubUrl ? (
           <video ref={videoRef} src={mediaUrl(dubUrl)} className="h-full w-full object-contain" controls autoPlay playsInline />
         ) : (
@@ -105,8 +105,8 @@ export default function Dub() {
           <button
             onClick={() => setSkeletons((on) => !on)}
             aria-pressed={skeletons}
-            className={`rounded-lg px-4 py-2 font-semibold ring-1 ${
-              skeletons ? 'bg-white text-stage-black ring-white' : 'bg-white/5 text-white/80 ring-white/15'
+            className={`px-4 py-2 ${
+              skeletons ? 'cv-btn bg-cream text-stage-black' : 'cv-btn-quiet bg-white/5 text-white/80'
             }`}
           >
             {skeletons ? 'Hide skeletons' : 'Show skeletons'}
@@ -127,12 +127,12 @@ export default function Dub() {
       )}
 
       <div className="mt-6 flex gap-3">
-        <button onClick={() => go('result')} className="rounded-lg bg-white/10 px-5 py-2">
+        <button onClick={() => go('result')} className="cv-btn-quiet bg-white/10 px-5 py-2">
           ← Scores
         </button>
         <button
           onClick={() => go('leaderboard')}
-          className="rounded-lg bg-spot px-5 py-2 font-bold text-stage-black"
+          className="cv-btn bg-spot px-5 py-2 font-bold text-stage-black"
         >
           Leaderboard →
         </button>

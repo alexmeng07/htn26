@@ -1,14 +1,123 @@
 @import "tailwindcss";
 
-/* Stage palette. The game lives on a dark AGT-style stage, so the whole app is
-   dark by design rather than theme-switching. */
+/* Self-hosted, so the game still looks right with the Wi-Fi off (I6). */
+@import "@fontsource/archivo-black/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/700.css";
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-sans/700.css";
+
+/* The game lives on a dark stage, dressed in a Choicer Voicer-style arcade
+   kit: its palette (mustard, teal, coral on near-black ink), Archivo Black
+   headlines, IBM Plex Mono labels, square corners, thick outlines and hard
+   offset shadows. Token names are unchanged, so every screen follows along. */
 @theme {
-  --color-stage-black: #08070c;
-  --color-stage-deep: #12101c;
-  --color-spot: #ffd76f;
-  --color-yes: #3ddc84;
-  --color-no: #ff5470;
+  --color-stage-black: #121311; /* ink */
+  --color-stage-deep: #1d1e1b;
+  --color-spot: #f2c84b; /* mustard */
+  --color-yes: #35b8b3; /* teal */
+  --color-no: #e85b46; /* coral */
+  --color-cream: #f5f0e6;
+
+  --font-sans: "IBM Plex Sans", system-ui, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Archivo Black", "IBM Plex Sans", sans-serif;
+
+  /* Square corners everywhere; rounded-full (dots, pills) is untouched. */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
 }
 
 html, body, #root { height: 100%; }
-body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+@layer base {
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    /* A faint halftone of stage light, so the dark isn't flat. */
+    background-color: var(--color-stage-black);
+    background-image: radial-gradient(rgb(245 240 230 / 0.05) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+  h1, h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  button {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  /* Primary action: cream outline, coral block shadow; presses into place. */
+  .cv-btn {
+    border: 2px solid var(--color-cream);
+    box-shadow: 4px 4px 0 var(--color-no);
+    transition: transform 80ms ease, box-shadow 80ms ease;
+  }
+  .cv-btn:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--color-no);
+  }
+  .cv-btn:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--color-no);
+  }
+  .cv-btn:disabled { box-shadow: none; }
+
+  /* Secondary action: same shape, quieter. */
+  .cv-btn-quiet {
+    border: 2px solid rgb(245 240 230 / 0.35);
+    box-shadow: 4px 4px 0 rgb(0 0 0 / 0.55);
+    transition: transform 80ms ease, box-shadow 80ms ease;
+  }
+  .cv-btn-quiet:hover:not(:disabled) { border-color: var(--color-cream); }
+  .cv-btn-quiet:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 rgb(0 0 0 / 0.55);
+  }
+
+  /* Information card: outlined, teal block shadow. */
+  .cv-card {
+    background: var(--color-stage-deep);
+    border: 2px solid rgb(245 240 230 / 0.85);
+    box-shadow: 6px 6px 0 var(--color-yes);
+  }
+
+  /* Video and canvas frames: outlined, mustard block shadow. */
+  .cv-frame {
+    border: 2px solid var(--color-cream);
+    box-shadow: 6px 6px 0 var(--color-spot);
+  }
+
+  /* Small uppercase mono label, the kit's signature. */
+  .cv-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* A coral "NEW"-style tag. */
+  .cv-tag {
+    display: inline-block;
+    background: var(--color-no);
+    color: var(--color-cream);
+    padding: 0.15rem 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}

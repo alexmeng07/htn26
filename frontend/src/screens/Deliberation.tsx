@@ -89,7 +89,7 @@ export default function Deliberation() {
             <p className="text-no">{error}</p>
             <button
               onClick={() => go('ready')}
-              className="rounded-lg bg-spot px-5 py-2 font-bold text-stage-black"
+              className="cv-btn bg-spot px-5 py-2 font-bold text-stage-black"
             >
               Try again
             </button>

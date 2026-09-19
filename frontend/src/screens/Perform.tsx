@@ -150,7 +150,7 @@ export default function Perform() {
       className="flex min-h-screen flex-col px-4 py-6"
     >
       <header className="mb-4 text-center">
-        <p className="text-sm uppercase tracking-widest text-white/40">
+        <p className="cv-label text-white/50">
           {scene.movie_title} — {scene.character_name}
         </p>
         <p className="mt-1 text-white/70">{scene.tip}</p>
@@ -158,7 +158,7 @@ export default function Perform() {
 
       <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
         {/* The character, cut out of the film by SAM 2. */}
-        <div className="relative overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+        <div className="relative overflow-hidden cv-frame bg-black">
           <span className="absolute left-3 top-3 z-10 rounded bg-black/60 px-2 py-1 text-xs text-white/70">
             {scene.character_name}
           </span>
@@ -191,7 +191,7 @@ export default function Perform() {
         </div>
 
         {/* The player. */}
-        <div className="relative overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+        <div className="relative overflow-hidden cv-frame bg-black">
           <span className="absolute left-3 top-3 z-10 rounded bg-black/60 px-2 py-1 text-xs text-white/70">
             You
           </span>
@@ -243,7 +243,7 @@ export default function Perform() {
         {phase === 'error' && (
           <div className="space-y-2">
             <p className="text-no">{error}</p>
-            <button onClick={() => go('ready')} className="rounded-lg bg-white/10 px-5 py-2 text-sm">
+            <button onClick={() => go('ready')} className="cv-btn-quiet bg-white/10 px-5 py-2 text-sm">
               Try again
             </button>
           </div>

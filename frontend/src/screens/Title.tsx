@@ -27,7 +27,7 @@ export default function Title() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your nickname"
-          className="mt-8 w-full rounded-lg bg-stage-deep px-4 py-3 text-center outline-none ring-1 ring-white/10 focus:ring-spot"
+          className="mt-8 w-full border-2 border-cream/50 bg-stage-deep px-4 py-3 text-center font-mono outline-none focus:border-spot"
         />
         <button
           disabled={!name.trim() || !scene}
@@ -35,7 +35,7 @@ export default function Title() {
             setNickname(name.trim())
             go('briefing')
           }}
-          className="mt-4 w-full rounded-lg bg-spot px-4 py-3 font-bold text-stage-black disabled:opacity-40"
+          className="mt-4 w-full cv-btn bg-spot px-4 py-3 font-bold text-stage-black disabled:opacity-40"
         >
           Start
         </button>

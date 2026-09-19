@@ -144,6 +144,9 @@ class RoundResult(BaseModel):
     # The player's skeleton on the replay (the character's is the scene's
     # overlay.json). None when the replay fell back to the side-by-side.
     replay_overlay: str | None = None
+    # Loudness envelopes of the original clip and the player's raw microphone,
+    # for the replay's side-by-side waveform. None if either had no audio.
+    waveforms: str | None = None
     fallback_used: bool = False  # UI shows "judges on a coffee break"
     # False while the voice judge is still listening: face and body are decided
     # and can be revealed; `pending` lists who is still to come. Final results

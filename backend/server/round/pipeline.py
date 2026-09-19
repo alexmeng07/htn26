@@ -21,6 +21,7 @@ loudness envelope, OpenAI down -> canned lines, ElevenLabs down -> bubbles only.
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import time
 from collections.abc import Awaitable, Callable
@@ -215,6 +216,27 @@ async def _dub(round_id: str, take: Path, sbs: Path, pack: ScenePack) -> str:
         return round_media_url(round_id, video.name)
 
 
+def _waveforms(take: Path, pack: ScenePack, dst: Path) -> Path | None:
+    """Original-clip vs microphone loudness, for the replay's waveform comparison.
+
+    The player's side is the RAW take, not the dub: the point is to see how the
+    player's own delivery lined up with the character's. Voiced flags use the
+    same measure as the local voice estimate, so the picture and that score agree.
+    """
+    clip = scene_dir(pack.scene_id) / "trimmed.mp4"
+    if not clip.exists():
+        return None
+    original, player = ffmpeg.audio_levels(clip), ffmpeg.audio_levels(take)
+    if not original or not player:
+        return None
+    dst.write_text(json.dumps({
+        "hop_s": local_voice.HOP_S,
+        "original": {"db": original, "voiced": local_voice.voiced(original)},
+        "player": {"db": player, "voiced": local_voice.voiced(player)},
+    }, separators=(",", ":")), encoding="utf-8")
+    return dst
+
+
 def _judge_results(
     personas: list[Persona], verdict, lines: list[JudgeLine], urls: list[str | None]
 ) -> list[JudgeResult]:
@@ -343,6 +365,12 @@ async def run_round(
     await publish(RoundEvent(event="verdict_ready", round_id=round_id))
     await asyncio.to_thread(db.save_result, result)  # after: never delays the verdict
 
+    try:
+        waves = await asyncio.to_thread(_waveforms, take, pack, folder / "waveforms.json")
+        if waves:
+            result.waveforms = round_media_url(round_id, waves.name)
+    except Exception as exc:  # noqa: BLE001 - a missing waveform never costs the replay
+        log.warning("Waveforms failed: %r", exc)
     result.dub_url = await dub_task if dub_task else None
     skeleton = composite.overlay_path(folder / "replay.mp4")
     if result.dub_url and skeleton.exists():  # only written when the overlay replay was built

@@ -48,11 +48,11 @@ export default function Watch() {
       className="flex min-h-screen flex-col items-center px-4 py-6"
     >
       <header className="mb-4 text-center">
-        <p className="text-sm uppercase tracking-widest text-white/40">Study the scene</p>
+        <p className="cv-label text-white/50">Study the scene</p>
         <h2 className="mt-1 text-2xl font-bold text-spot">{scene.character_name}</h2>
       </header>
 
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+      <div className="relative w-full max-w-4xl overflow-hidden cv-frame bg-black">
         {src ? (
           <video
             ref={videoRef}
@@ -106,12 +106,12 @@ export default function Watch() {
       </div>
 
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <button onClick={replay} className="rounded-lg bg-white/10 px-5 py-2.5 text-sm">
+        <button onClick={replay} className="cv-btn-quiet bg-white/10 px-5 py-2.5 text-sm">
           ↺ Watch again
         </button>
         <button
           onClick={() => go('ready')}
-          className={`rounded-lg px-6 py-2.5 font-bold text-stage-black ${ended ? 'bg-spot' : 'bg-spot/70'}`}
+          className={`cv-btn px-6 py-2.5 font-bold text-stage-black ${ended ? 'bg-spot' : 'bg-spot/70'}`}
         >
           I'm ready →
         </button>

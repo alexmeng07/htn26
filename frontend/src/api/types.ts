@@ -92,6 +92,8 @@ export interface RoundResult {
   dub_url: string | null
   /** The player's skeleton on the replay; null if the replay is the side-by-side. */
   replay_overlay: string | null
+  /** Original-clip vs microphone loudness for the replay; null if unavailable. */
+  waveforms: string | null
   fallback_used: boolean
   /** false: face and body are in and can be revealed; `pending` is still coming. */
   complete: boolean

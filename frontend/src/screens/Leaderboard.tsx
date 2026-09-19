@@ -50,7 +50,7 @@ export default function Leaderboard() {
             </li>
           ))}
         </ol>
-        <button onClick={() => go('title')} className="mt-8 rounded-lg bg-white/10 px-5 py-2">
+        <button onClick={() => go('title')} className="mt-8 cv-btn-quiet bg-white/10 px-5 py-2">
           Next player
         </button>
       </div>
