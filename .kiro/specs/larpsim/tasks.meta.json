@@ -1,0 +1,454 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Rename the product to LARPsim on user-visible surfaces: the `Title` screen heading,": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835850347
+      },
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835864035
+      },
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835963422
+      }
+    ],
+    "1.2 Confirm `uv run pytest -q` (16 passed) and `GET /health` (200) after the rename, proving no": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835850575
+      },
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835967030
+      }
+    ],
+    "1.8 Correct `README.md`, `Makefile`, and `tasks.ps1` on the *toolchain*: portable-zip Node, the": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835850721
+      }
+    ],
+    "2.2 Add keypoint timeline models to `server/schemas.py`: one sample = timestamp in seconds since": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835850816
+      }
+    ],
+    "2.3 Determine the **comparison scope** per reference frame: the set of pose landmarks whose": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835850936
+      }
+    ],
+    "2.4 Derive the scope's measures, each carrying a confidence equal to the minimum `visibility` of": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851084
+      }
+    ],
+    "2.5 Score pose similarity over the scope: confidence-weighted mean absolute difference across its": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851207
+      }
+    ],
+    "2.6 Keep framing out of the pose score. If a framing signal is wanted, compute it separately —": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851297
+      }
+    ],
+    "2.7 Score facial similarity from blendshape coefficients, weighting expressive channels above": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851395
+      }
+    ],
+    "2.8 Align in time with a tolerance window: for each reference sample, score against the": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851499
+      }
+    ],
+    "2.9 Aggregate into a `ComparisonReport`: drop reference samples with no detection, weight samples": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851633
+      }
+    ],
+    "2.10 Unit-test comparison against hand-built synthetic timelines: identical (expect 100),": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851813
+      }
+    ],
+    "2.11 Assert determinism: the same timelines and pack scored twice produce byte-identical face and": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835851914
+      }
+    ],
+    "2.12 Expose `POST /grade/compare`: two keypoint timelines plus a scene id in, a": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852017
+      }
+    ],
+    "3.1 Extract reference pose and face over the trimmed clip in Python, cached as a discrete prep": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852122
+      }
+    ],
+    "3.2 Sample the player live in the browser during the take, timestamped against the same clock": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852225
+      }
+    ],
+    "3.3 Implement server-side player extraction as the fallback when the browser cannot sample,": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852317
+      }
+    ],
+    "3.4 Parity-test Python and browser extraction on the same input: same model files, same": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852418
+      }
+    ],
+    "3.5 Select 6–10 key moments from the keypoint timeline by largest pose or expression change,": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852516
+      }
+    ],
+    "3.6 Resolve the clip tolerantly: the configured filename first, then the single video file in the": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852618
+      }
+    ],
+    "3.7 Generate a rights-clean fixture clip with ffmpeg for media plumbing only: 1280×720, 30 fps,": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852764
+      }
+    ],
+    "3.8 Build the reference sheet with one multimodal call for the whole clip, cached so re-running": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835852923
+      }
+    ],
+    "3.9 Implement MongoDB access in `store/db.py`: lazy client, short connect timeout, pack upsert,": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853059
+      }
+    ],
+    "3.10 Assemble the pack: validate against the scene-pack model, record duration and a prepared-at": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853170
+      }
+    ],
+    "3.11 Run prep end to end on the fixture scene; confirm `GET /scene` serves the resulting pack": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853289
+      }
+    ],
+    "3.12 Run prep on `assets/private/test-scene-1/test_clip_1.mp4` (present as of 2026-09-19) and": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853412
+      }
+    ],
+    "4.1 Smoke-test the paid services before anything depends on them: multimodal": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853532
+      }
+    ],
+    "4.2 Implement the voice comparison in `compare/omni.py`: build the side-by-side video — character": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853666
+      }
+    ],
+    "4.3 Implement the local voice estimate used when the model is unavailable: derive a 0–100 score": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853798
+      }
+    ],
+    "4.4 Implement judge writing in `judges/writer.py`: one structured call for all three judges, the": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835853920
+      }
+    ],
+    "4.5 Write and commit pre-written lines for every judge × vote × band, and implement selection as": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835854100
+      }
+    ],
+    "4.6 Synthesise speech with the first judge awaited and judges two and three generated": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835854233
+      }
+    ],
+    "4.7 Design the three judge voices from text descriptions, store the IDs in `.env`, and confirm": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835854380
+      }
+    ],
+    "4.8 Generate the sound-effect set once — drumroll, YES, NO, applause, golden buzzer — and cache": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835854532
+      }
+    ],
+    "4.9 Implement `round/pipeline.py` in this order: grading first (local, no network), then": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835854787
+      }
+    ],
+    "4.10 Accept the take plus its keypoint timeline on `POST /rounds/{id}/take` (currently 501),": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835855158
+      }
+    ],
+    "4.11 Integration-test the pipeline under `FORCE_FALLBACK=1`: assert the event order": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835855324
+      }
+    ],
+    "4.12 Play one real round end to end and record the measured wait from take-end to first judge": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835855487
+      }
+    ],
+    "5.1 Generate placeholder judge sprites and document the drop-in contract: `assets/judges/<id>/`": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835855651
+      }
+    ],
+    "5.2 Build `Briefing` and `Ready`, including the headphone gate that blocks the countdown until": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835855823
+      }
+    ],
+    "5.3 Handle denied camera or microphone permission on `Ready` with a recoverable error: say which": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835855983
+      }
+    ],
+    "5.4 Build `Deliberation`: dimmed stage, conferring sprites, drumroll, subscribed to the round": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835856142
+      }
+    ],
+    "5.5 Build `Verdict`: judges revealed one at a time — talking animation, speech bubble, their": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835856299
+      }
+    ],
+    "5.6 Build `Result`: celebration on pass, the distinct golden-buzzer variant, and Try Again": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835856466
+      }
+    ],
+    "5.7 Draw the live skeleton overlay during the performance": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835856633
+      }
+    ],
+    "5.8 Extend the hardcoded-scene guard in `backend/tests/test_scene.py` to cover `frontend/src/`,": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835856787
+      }
+    ],
+    "6.1 Wire `FORCE_FALLBACK` so one env var makes every external call take its local path, and a": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835856947
+      }
+    ],
+    "6.2 Show the light-hearted fallback notice when `RoundResult.fallback_used` is set": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835857101
+      }
+    ],
+    "6.3 Handle the no-headphones path: mute the scene audio for the take and show subtitles": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835857256
+      }
+    ],
+    "6.4 Prep a second scene, flip `ACTIVE_SCENE`, and confirm every scene-specific string and media": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835857450
+      }
+    ],
+    "6.5 Break segmentation deliberately and confirm face, body, voice, the votes, and the verdict are": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835857618
+      }
+    ],
+    "6.6 Run the offline rehearsal: network adapter disabled, one complete round start to finish": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835857785
+      }
+    ],
+    "6.7 Tune the thresholds and every `(default N, tune in 6.7)` constant above toward a 30–50%": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835857931
+      }
+    ],
+    "7.1 Produce the replay with the player's audio transformed into a voice designed from the pack's": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835858084
+      }
+    ],
+    "7.2 Composite the player into the scene where masks exist, falling back to side-by-side": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835858229
+      }
+    ],
+    "7.3 Build the `Dub` and `Leaderboard` screens, the leaderboard updating without a manual reload": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835858382
+      }
+    ],
+    "7.4 Correct `HANDOFF.md` where it contradicts this spec: the scene is chosen, grading is": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835858535
+      }
+    ],
+    "7.5 Write the per-sponsor paragraphs honestly — naming the specific job each technology does —": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835858699
+      }
+    ],
+    "7.6 Confirm no credential and no clip is in git history; record the source and licence note in": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835858902
+      }
+    ],
+    "8.1 Feature freeze": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835859212
+      }
+    ],
+    "8.2 Rehearse end to end": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835859518
+      }
+    ],
+    "8.3 Record a backup video": [
+      {
+        "executionId": "82a8953b-f2dc-41eb-9855-9874e6273daa",
+        "chatSessionId": "sess_da1eb042-999f-4ea7-8404-6facb4678f7c",
+        "timestamp": 1789835859711
+      }
+    ]
+  }
+}

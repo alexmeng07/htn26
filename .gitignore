@@ -18,6 +18,14 @@ scenes/*/frames/
 data/rounds/
 data/tmp/
 
+# ---- Setup / verification script output ----
+.kiro/scripts/*.log
+.kiro/scripts/*.out
+.kiro/scripts/*.err
+
+# ---- Downloaded keypoint models (fetch with the setup script) ----
+assets/models/
+
 # ---- Secrets ----
 .env
 .env.local
@@ -37,7 +45,7 @@ build/
 
 # ---- Node ----
 node_modules/
-web/dist/
+frontend/dist/
 .vite/
 *.tsbuildinfo
 

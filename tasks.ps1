@@ -3,6 +3,10 @@
         .\tasks.ps1 setup
         .\tasks.ps1 dev
         .\tasks.ps1 prep -Scene dev-clip
+
+    Layout: Python lives in backend\, the React app in frontend\. The Python
+    project root (pyproject.toml, uv.lock, .venv) stays at the repo root so
+    there is one venv for the repo -- hence `--app-dir backend` below.
 #>
 param(
     [Parameter(Position = 0)][string]$Target = 'help',
@@ -29,28 +33,29 @@ $port = Get-EnvValue 'SERVER_PORT' '8000'
 switch ($Target) {
     'setup' {
         uv sync --all-groups
-        Push-Location web; pnpm install; Pop-Location
+        Push-Location frontend; pnpm install; Pop-Location
     }
     'dev' {
         Start-Process -FilePath 'uv' -ArgumentList @(
-            'run', 'uvicorn', 'server.main:app', '--reload', '--port', $port
+            'run', 'uvicorn', '--app-dir', 'backend', 'server.main:app', '--reload', '--port', $port
         )
-        Push-Location web; pnpm dev; Pop-Location
+        Push-Location frontend; pnpm dev; Pop-Location
     }
-    'server' { uv run uvicorn server.main:app --reload --port $port }
-    'web'    { Push-Location web; pnpm dev; Pop-Location }
+    'server' { uv run uvicorn --app-dir backend server.main:app --reload --port $port }
+    'web'    { Push-Location frontend; pnpm dev; Pop-Location }
     'prep' {
         if (-not $Scene) { $Scene = Get-EnvValue 'ACTIVE_SCENE' $null }
         if (-not $Scene) { throw 'Scene is required: .\tasks.ps1 prep -Scene <scene_id>' }
-        uv run python -m prep.run_all --scene $Scene
+        Push-Location backend
+        try { uv run python -m prep.run_all --scene $Scene } finally { Pop-Location }
     }
     'test' {
         uv run pytest -q
-        Push-Location web; pnpm test; Pop-Location
+        Push-Location frontend; pnpm test; Pop-Location
     }
     'lint' {
         uv run ruff check .
-        Push-Location web; pnpm lint; Pop-Location
+        Push-Location frontend; pnpm lint; Pop-Location
     }
     'check' { Invoke-RestMethod "http://127.0.0.1:$port/health" | ConvertTo-Json -Depth 5 }
     default {

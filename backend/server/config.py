@@ -11,7 +11,9 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT = Path(__file__).resolve().parent.parent
+# Repo root, not the backend root: .env, assets/ and scenes/ are shared with the
+# frontend and stay at the top level. backend/server/config.py -> parents[2].
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):

@@ -18,7 +18,7 @@ ALLOWED = (
     "docs/",
     "HANDOFF.md",
     "README.md",
-    "tests/test_scene.py",
+    "backend/tests/test_scene.py",
 )
 
 # The worked example from HANDOFF.md. If any of these leak into code, the "swap

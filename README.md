@@ -98,14 +98,29 @@ for the live demo only.
 
 ## Layout
 
+Two halves, plus the data both of them read.
+
 ```
-prep/            Scene Prep pipeline (run once per scene)
-infra/truss/     SAM 2 packaged for Baseten
-server/          FastAPI: compare · rules · judges · voice · store · round
-web/             React stage: screens, sprites, camera capture
-scenes/          One folder per scene — the only place scene details live
-assets/          Judge sprites, cached SFX, fallback lines, private clips
-docs/            Codex log, Devpost draft
+backend/                 Python — everything server-side
+  server/                FastAPI: compare · rules · judges · voice · store · round
+  prep/                  Scene Prep pipeline (run once per scene)
+  scripts/               one-off dev utilities (model download)
+  tests/                 pytest
+
+frontend/                React stage: screens, sprites, camera capture
+
+scenes/                  One folder per scene — the only place scene details live
+assets/                  Judge sprites, cached SFX, fallback lines, private clips
+infra/truss/             SAM 2 packaged for Baseten
+docs/                    Codex log, Devpost draft
 ```
+
+`scenes/` and `assets/` sit at the top level because both halves use them: prep
+writes them, the API reads them, and the browser fetches sprites and keypoint
+models from them.
+
+The Python project root (`pyproject.toml`, `uv.lock`, `.venv`) stays at the repo
+root, so there is one virtualenv for the whole repo and `uv run` works from
+anywhere. Imports are unchanged — still `server.*` and `prep.*`.
 
 See `HANDOFF.md` for the full design, sponsor tracks and build plan.

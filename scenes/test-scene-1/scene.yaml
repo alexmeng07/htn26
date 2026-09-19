@@ -9,7 +9,9 @@ movie_title: "The Bear"
 character_name: "Carmy"
 actor_name: "Jeremy Allen White"
 
-clip_file: assets/private/test-scene-1/raw.mp4
+# If this exact file is absent but a single video sits in the scene's private
+# directory, prep uses that one and says loudly that it substituted.
+clip_file: assets/private/test-scene-1/test_clip_1.mp4
 start: "00:00:00"
 end: "00:00:10.400"
 

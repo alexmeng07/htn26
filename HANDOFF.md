@@ -1,4 +1,5 @@
 # SceneStealer — Project Handoff v4 (Hack the North 2026)
+Note: This file is outdated. For conflicting information, refer to information in specs.
 
 > **For:** teammates and coding agents (Claude Code, Codex, etc.).
 > **Scope of this version:** one working demo of **one uncut scene**. Multi-scene progression is out of scope for now.
@@ -330,44 +331,69 @@ That's about **6–8 seconds**, which is fully covered by the deliberation anima
 
 ## 9. Components and folders
 
+Two halves — `backend/` and `frontend/` — plus the shared data both of them read.
+It is still **one process per half**, not microservices: the split is about
+folders and ownership, so two people can work without colliding.
+
 ```
 /
 ├── HANDOFF.md              ← this file
 ├── README.md               ← setup/run steps (required by the Huawei track)
 ├── Makefile                ← make dev / make prep / make test
+├── tasks.ps1               ← the Windows equivalent
+├── pyproject.toml          ← Python project root: one .venv for the whole repo
 ├── .env.example
-├── docs/
-│   ├── codex-log.md        ← OpenAI prize evidence
-│   └── devpost-draft.md
-├── scenes/                 ← one folder per scene: scene.yaml (+ generated scene pack)
-├── prep/                   ← generic Scene Prep pipeline (run once per scene)
-│   ├── trim.py            ← all prep scripts take --scene <scene_id>
-│   ├── isolate_client.py   ← calls the SAM 2 endpoint on Baseten
-│   ├── keyframes.py
-│   ├── annotate_reference.py  ← OMNI reference sheet
-│   └── build_pack.py
-├── infra/truss/sam2/       ← the Baseten Truss for SAM 2
-├── server/                 ← FastAPI backend
-│   ├── main.py             ← routes + event stream
-│   ├── round/              ← round lifecycle (recording → judging → verdict → dub)
-│   ├── media/              ← ffmpeg helpers (side-by-side, downscale, audio)
-│   ├── compare/            ← OMNI client, prompt, response validation, fallback
-│   ├── rules/              ← thresholds, votes, golden buzzer
-│   ├── judges/             ← OpenAI persona prompts + structured output
-│   ├── voice/              ← ElevenLabs speech, SFX cache, voice changer
-│   └── store/              ← MongoDB + local JSON fallback
-├── web/                    ← React app
+│
+├── backend/                ← everything Python. Imports stay `server.*` / `prep.*`
+│   ├── server/             ← FastAPI backend
+│   │   ├── main.py         ← routes + event stream
+│   │   ├── round/          ← round lifecycle (recording → judging → verdict → dub)
+│   │   ├── media/          ← ffmpeg helpers (side-by-side, downscale, audio)
+│   │   ├── compare/        ← OMNI client, prompt, response validation, fallback
+│   │   ├── rules/          ← thresholds, votes, golden buzzer
+│   │   ├── judges/         ← OpenAI persona prompts + structured output
+│   │   ├── voice/          ← ElevenLabs speech, SFX cache, voice changer
+│   │   └── store/          ← MongoDB + local JSON fallback
+│   ├── prep/               ← generic Scene Prep pipeline (run once per scene)
+│   │   ├── trim.py         ← all prep scripts take --scene <scene_id>
+│   │   ├── isolate_client.py  ← calls the SAM 2 endpoint on Baseten
+│   │   ├── keyframes.py
+│   │   ├── annotate_reference.py  ← OMNI reference sheet
+│   │   └── build_pack.py
+│   ├── scripts/            ← one-off dev utilities (keypoint model download)
+│   └── tests/              ← pytest
+│
+├── frontend/               ← React app
 │   └── src/
 │       ├── screens/        ← Title, Briefing, Ready, Perform, Deliberation, Verdict, Result, Dub, Leaderboard
 │       ├── stage/          ← judge desk, sprites, speech bubbles, lights, confetti
 │       ├── capture/        ← camera, recording, framing guide
+│       ├── store/          ← Zustand game state
 │       └── api/
-└── assets/
-    ├── judges/             ← Alex's sprites (see section 10)
-    ├── sfx/                ← cached sound effects
-    ├── fallback/           ← pre-generated judge lines for offline mode
-    └── private/            ← movie clips + isolated videos, per scene (gitignored)
+│
+├── scenes/                 ← one folder per scene: scene.yaml (+ generated scene pack)
+├── assets/                 ← shared: prep writes, the API reads, the browser fetches
+│   ├── judges/             ← Alex's sprites (see section 10)
+│   ├── sfx/                ← cached sound effects
+│   ├── models/             ← keypoint models, served from our own origin (gitignored)
+│   ├── fallback/           ← pre-generated judge lines for offline mode
+│   └── private/            ← movie clips + isolated videos, per scene (gitignored)
+├── infra/truss/sam2/       ← the Baseten Truss for SAM 2
+└── docs/
+    ├── codex-log.md        ← OpenAI prize evidence
+    └── devpost-draft.md
 ```
+
+**Why `scenes/` and `assets/` stay at the top level:** they are data, not code,
+and both halves touch them. Prep writes the isolated video and masks, the API
+reads the scene pack, and the browser fetches judge sprites and keypoint models
+over HTTP. Burying them under `backend/` would make the frontend reach across a
+boundary for its own assets.
+
+**Why `pyproject.toml` stays at the root:** one virtualenv for the repo, so
+`uv run pytest` and `uv run ruff check .` work from anywhere. Pytest gets
+`pythonpath = ["backend"]`; the server runs as
+`uvicorn --app-dir backend server.main:app`. No import paths changed.
 
 ### 9.1 Backend routes
 
@@ -513,11 +539,11 @@ DEFAULT_THRESHOLD=70                 # used only if the scene pack sets none
 
 | Lane | Folders | Notes |
 |---|---|---|
-| A. Scene Prep + Baseten | `prep/`, `infra/truss/` | Unblocks everything else; start first |
-| B. Frontend stage + sprites | `web/` | Can start immediately with placeholder sprites and a fake result |
-| C. Compare (OMNI) + rules | `server/compare/`, `server/rules/`, `server/media/` | Needs OMNI credits |
-| D. Judges (OpenAI, via Codex) + voices | `server/judges/`, `server/voice/` | Great Codex task |
-| E. Round glue + data | `server/round/`, `server/store/` | Connects everything |
+| A. Scene Prep + Baseten | `backend/prep/`, `infra/truss/` | Unblocks everything else; start first |
+| B. Frontend stage + sprites | `frontend/` | Can start immediately with placeholder sprites and a fake result |
+| C. Compare (OMNI) + rules | `backend/server/compare/`, `.../rules/`, `.../media/` | Needs OMNI credits |
+| D. Judges (OpenAI, via Codex) + voices | `backend/server/judges/`, `.../voice/` | Great Codex task |
+| E. Round glue + data | `backend/server/round/`, `.../store/` | Connects everything |
 
 ### Phase 1 — De-risk (first ~3 hours)
 
