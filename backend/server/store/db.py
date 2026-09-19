@@ -1,6 +1,8 @@
-"""MongoDB Atlas: scene packs, round results, live leaderboard.
+"""MongoDB Atlas persistence with a local JSON safety net.
 
-Every read falls back to local JSON so the game survives the Wi-Fi dying.
+Round results are always mirrored locally. Leaderboard reads merge bounded
+Atlas candidates with that mirror, so scores captured during an outage do not
+disappear when Atlas comes back online.
 """
 
 from __future__ import annotations
@@ -18,50 +20,125 @@ from server.schemas import LeaderboardEntry, RoundResult
 
 log = logging.getLogger(__name__)
 
-# After a failure, skip Atlas for a while instead of paying the connection
-# timeout on every request -- the local JSON copy carries the game meanwhile.
 RETRY_AFTER_S = 60.0
+MAX_LEADERBOARD_LIMIT = 100
 _down_until = 0.0
 
 
 @lru_cache
 def client() -> MongoClient | None:
-    uri = get_settings().mongodb_uri
-    return MongoClient(uri, serverSelectionTimeoutMS=3000) if uri else None
+    settings = get_settings()
+    return (
+        MongoClient(
+            settings.mongodb_uri,
+            serverSelectionTimeoutMS=3000,
+            connectTimeoutMS=3000,
+            socketTimeoutMS=3000,
+        )
+        if settings.mongodb_uri
+        else None
+    )
 
 
-def _collection(name: str):
-    c = client()
-    if c is None or time.monotonic() < _down_until:
-        return None
-    return c[get_settings().mongodb_db][name]
-
-
-def _rounds():
-    return _collection("rounds")
-
-
-def save_pack(pack: dict) -> bool:
-    """Upsert a scene pack into `scene_packs`. False (and a warning) if Atlas is down;
-    the caller has already written pack.json, which is what the game reads."""
-    packs = _collection("scene_packs")
-    if packs is None:
-        return False
-    try:
-        packs.replace_one({"scene_id": pack["scene_id"]}, pack, upsert=True)
-        return True
-    except PyMongoError as exc:
-        _mark_down(exc)
-        return False
+def _mark_up() -> None:
+    global _down_until
+    _down_until = 0.0
 
 
 def _mark_down(exc: Exception) -> None:
     global _down_until
     _down_until = time.monotonic() + RETRY_AFTER_S
     log.warning(
-        "MongoDB unavailable, using local JSON for %.0fs: %s",
-        RETRY_AFTER_S, str(exc).split(",")[0],
+        "MongoDB unavailable, using local JSON for %.0fs (%s)",
+        RETRY_AFTER_S,
+        type(exc).__name__,
     )
+
+
+def _collection(name: str):
+    settings = get_settings()
+    if settings.force_fallback or time.monotonic() < _down_until:
+        return None
+    try:
+        c = client()
+    except (PyMongoError, ValueError) as exc:
+        _mark_down(exc)
+        return None
+    return c[settings.mongodb_db][name] if c is not None else None
+
+
+def _rounds():
+    return _collection("rounds")
+
+
+def mongo_status(*, force_probe: bool = False) -> dict[str, bool | float | str]:
+    """Return sanitized Atlas readiness without exposing connection details.
+
+    Normal health checks honor the circuit breaker, avoiding repeated slow
+    probes during an outage. The explicit sync command can force one probe.
+    """
+    settings = get_settings()
+    if settings.force_fallback:
+        return {
+            "configured": bool(settings.mongodb_uri),
+            "reachable": False,
+            "mode": "forced-local",
+            "detail": "local fallback forced",
+        }
+    if not settings.mongodb_uri:
+        return {
+            "configured": False,
+            "reachable": False,
+            "mode": "local",
+            "detail": "MONGODB_URI missing",
+        }
+
+    retry_after = max(0.0, _down_until - time.monotonic())
+    if retry_after and not force_probe:
+        return {
+            "configured": True,
+            "reachable": False,
+            "mode": "local",
+            "detail": "unreachable; serving local mirror",
+            "retry_after_s": round(retry_after, 1),
+        }
+
+    try:
+        c = client()
+        if c is None:
+            raise RuntimeError("MongoDB client is not configured")
+        c.admin.command("ping")
+    except (PyMongoError, RuntimeError, ValueError) as exc:
+        _mark_down(exc)
+        return {
+            "configured": True,
+            "reachable": False,
+            "mode": "local",
+            "detail": "unreachable; serving local mirror",
+            "retry_after_s": RETRY_AFTER_S,
+        }
+
+    _mark_up()
+    return {
+        "configured": True,
+        "reachable": True,
+        "mode": "atlas+local",
+        "detail": "connected",
+    }
+
+
+def save_pack(pack: dict) -> bool:
+    """Upsert a scene pack, returning whether Atlas confirmed the write."""
+    packs = _collection("scene_packs")
+    if packs is None:
+        return False
+    try:
+        packs.replace_one({"scene_id": pack["scene_id"]}, pack, upsert=True)
+        _mark_up()
+        return True
+    except (PyMongoError, ValueError) as exc:
+        _mark_down(exc)
+        return False
 
 
 def _local_dir() -> Path:
@@ -70,54 +147,73 @@ def _local_dir() -> Path:
     return path
 
 
-def save_result(result: RoundResult) -> None:
-    """Upsert into `rounds`; always mirrored to local JSON under DATA_DIR."""
+def save_result(result: RoundResult) -> bool:
+    """Mirror a round locally, then upsert it to Atlas.
+
+    ``False`` means the durable local copy succeeded but Atlas did not confirm
+    the write. Retrying is safe because ``round_id`` is the upsert key.
+    """
     (_local_dir() / f"{result.round_id}.json").write_text(
         result.model_dump_json(indent=2), encoding="utf-8"
     )
     rounds = _rounds()
     if rounds is None:
-        return
+        return False
     try:
         rounds.replace_one(
             {"round_id": result.round_id}, result.model_dump(mode="python"), upsert=True
         )
-    except PyMongoError as exc:
+        _mark_up()
+        return True
+    except (PyMongoError, ValueError) as exc:
         _mark_down(exc)
+        return False
 
 
-def _best_per_nickname(results: list[RoundResult], limit: int) -> list[LeaderboardEntry]:
+def _best_rounds(results: list[RoundResult], limit: int) -> list[RoundResult]:
     best: dict[str, RoundResult] = {}
-    for r in results:
-        if r.nickname not in best or r.combined > best[r.nickname].combined:
-            best[r.nickname] = r
-    ranked = sorted(best.values(), key=lambda r: (-r.combined, r.created_at))[:limit]
+    for result in results:
+        current = best.get(result.nickname)
+        if current is None or result.combined > current.combined or (
+            result.combined == current.combined and result.created_at < current.created_at
+        ):
+            best[result.nickname] = result
+    return sorted(best.values(), key=lambda result: (-result.combined, result.created_at))[:limit]
+
+
+def _entries(results: list[RoundResult], limit: int) -> list[LeaderboardEntry]:
     return [
         LeaderboardEntry(
-            nickname=r.nickname, combined=r.combined, scene_id=r.scene_id,
-            passed=r.passed, created_at=r.created_at,
+            nickname=result.nickname,
+            combined=result.combined,
+            scene_id=result.scene_id,
+            passed=result.passed,
+            created_at=result.created_at,
         )
-        for r in ranked
+        for result in _best_rounds(results, limit)
     ]
 
 
-def _top_local(limit: int, scene_id: str | None) -> list[LeaderboardEntry]:
-    results = []
+def _local_results(scene_id: str | None = None) -> list[RoundResult]:
+    results: list[RoundResult] = []
     for path in _local_dir().glob("*.json"):
         try:
-            r = RoundResult.model_validate_json(path.read_text(encoding="utf-8"))
+            result = RoundResult.model_validate_json(path.read_text(encoding="utf-8"))
         except ValueError:
+            log.warning("Skipping invalid local round file: %s", path.name)
             continue
-        if scene_id is None or r.scene_id == scene_id:
-            results.append(r)
-    return _best_per_nickname(results, limit)
+        if scene_id is None or result.scene_id == scene_id:
+            results.append(result)
+    return results
 
 
-def top(limit: int = 10, scene_id: str | None = None) -> list[LeaderboardEntry]:
-    """Best combined score per nickname, highest first."""
-    rounds = _rounds()
-    if rounds is None:
-        return _top_local(limit, scene_id)
+def _top_local(limit: int, scene_id: str | None) -> list[LeaderboardEntry]:
+    safe_limit = min(max(limit, 1), MAX_LEADERBOARD_LIMIT)
+    return _entries(_local_results(scene_id), safe_limit)
+
+
+def _mongo_candidates(rounds, limit: int, scene_id: str | None) -> list[RoundResult]:
+    """Ask Atlas for at most ``limit`` best-per-nickname documents."""
     match = {"scene_id": scene_id} if scene_id else {}
     pipeline = [
         {"$match": match},
@@ -127,11 +223,34 @@ def top(limit: int = 10, scene_id: str | None = None) -> list[LeaderboardEntry]:
         {"$sort": {"combined": -1, "created_at": 1}},
         {"$limit": limit},
     ]
+    candidates: list[RoundResult] = []
+    for document in rounds.aggregate(pipeline):
+        try:
+            candidates.append(RoundResult.model_validate(document))
+        except ValueError:
+            log.warning("Skipping invalid MongoDB round document")
+    return candidates
+
+
+def top(limit: int = 10, scene_id: str | None = None) -> list[LeaderboardEntry]:
+    """Return each nickname's best score across Atlas and the local mirror."""
+    safe_limit = min(max(limit, 1), MAX_LEADERBOARD_LIMIT)
+    local = _best_rounds(_local_results(scene_id), safe_limit)
+    rounds = _rounds()
+    if rounds is None:
+        return _entries(local, safe_limit)
+
     try:
-        return [LeaderboardEntry(**doc) for doc in rounds.aggregate(pipeline)]
-    except PyMongoError as exc:
+        remote = _mongo_candidates(rounds, safe_limit, scene_id)
+        _mark_up()
+    except (PyMongoError, ValueError) as exc:
         _mark_down(exc)
-        return _top_local(limit, scene_id)
+        return _entries(local, safe_limit)
+
+    merged = {result.round_id: result for result in remote}
+    # Local is written first and may contain the richer/final version of a round.
+    merged.update({result.round_id: result for result in local})
+    return _entries(list(merged.values()), safe_limit)
 
 
 def load_result(round_id: str) -> RoundResult | None:

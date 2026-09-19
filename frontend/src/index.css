@@ -121,3 +121,72 @@ html, body, #root { height: 100%; }
     text-transform: uppercase;
   }
 }
+
+
+@layer base {
+  ::selection {
+    background: var(--color-spot);
+    color: var(--color-stage-black);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-spot);
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  /* Reusable editorial surfaces for the remaining screens. */
+  .cv-panel {
+    background: rgb(29 30 27 / 0.94);
+    border: 2px solid rgb(245 240 230 / 0.72);
+    box-shadow: 5px 5px 0 rgb(0 0 0 / 0.65);
+  }
+
+  .cv-input {
+    border: 2px solid var(--color-cream);
+    background: var(--color-stage-deep);
+    box-shadow: 4px 4px 0 var(--color-yes);
+    color: var(--color-cream);
+    font-family: var(--font-mono);
+    transition: box-shadow 100ms ease, transform 100ms ease;
+  }
+  .cv-input::placeholder { color: rgb(245 240 230 / 0.65); }
+  .cv-input:focus {
+    box-shadow: 6px 6px 0 var(--color-spot);
+    transform: translate(-1px, -1px);
+  }
+
+  .cv-meter {
+    height: 0.8rem;
+    overflow: hidden;
+    border: 2px solid rgb(245 240 230 / 0.55);
+    background: var(--color-stage-black);
+  }
+
+  .cv-rule {
+    height: 2px;
+    border: 0;
+    background: rgb(245 240 230 / 0.28);
+  }
+
+  .cv-rank {
+    display: grid;
+    min-height: 3rem;
+    min-width: 3rem;
+    place-items: center;
+    border-right: 2px solid var(--color-stage-black);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-stage-black);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

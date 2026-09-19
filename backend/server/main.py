@@ -12,7 +12,7 @@ import uuid
 from collections import defaultdict
 from contextlib import asynccontextmanager, suppress
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ValidationError
@@ -107,13 +107,17 @@ def health() -> dict:
     except Exception as exc:  # noqa: BLE001 - health must never raise
         scene_ok, scene_detail = False, str(exc)
 
+    mongo = db.mongo_status()
     services = {
         name: ("missing keys: " + ", ".join(keys) if (keys := missing.get(name)) else "configured")
-        for name in ("omni", "openai", "elevenlabs", "baseten", "mongodb")
+        for name in ("omni", "openai", "elevenlabs", "baseten")
     }
+    services["mongodb"] = str(mongo["detail"])
+    mongo_ready = bool(mongo["reachable"]) or settings.force_fallback
     return {
-        "ok": not missing and scene_ok,
+        "ok": not missing and scene_ok and mongo_ready,
         "services": services,
+        "mongodb": mongo,
         "scene": {"ok": scene_ok, "active": scene_detail},
         "force_fallback": settings.force_fallback,
     }
@@ -230,6 +234,9 @@ def get_round(round_id: str) -> RoundResult:
 
 
 @app.get("/leaderboard", response_model=list[LeaderboardEntry])
-def leaderboard(limit: int = 10, scene_id: str | None = None) -> list[LeaderboardEntry]:
+def leaderboard(
+    limit: int = Query(default=10, ge=1, le=db.MAX_LEADERBOARD_LIMIT),
+    scene_id: str | None = None,
+) -> list[LeaderboardEntry]:
     """Best score per nickname, from MongoDB Atlas (local JSON if it is down)."""
     return db.top(limit=limit, scene_id=scene_id)

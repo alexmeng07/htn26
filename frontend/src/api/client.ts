@@ -42,8 +42,8 @@ export const api = {
 
   round: (roundId: string) => fetch(`${BASE}/rounds/${roundId}`).then(json<RoundResult>),
 
-  leaderboard: (sceneId?: string) =>
-    fetch(`${BASE}/leaderboard${sceneId ? `?scene_id=${encodeURIComponent(sceneId)}` : ''}`).then(
+  leaderboard: (sceneId?: string, signal?: AbortSignal) =>
+    fetch(`${BASE}/leaderboard${sceneId ? `?scene_id=${encodeURIComponent(sceneId)}` : ''}`, { signal }).then(
       json<LeaderboardEntry[]>,
     ),
 

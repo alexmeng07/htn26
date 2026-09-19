@@ -1,10 +1,10 @@
-"""Push everything saved locally while MongoDB was unreachable up to Atlas.
+"""Push locally mirrored rounds and scene packs to MongoDB Atlas.
 
-Rounds and scene packs are always written to local JSON first, so nothing is
-lost during an outage -- but the leaderboard reads Atlas once it is back, so
-run this after connectivity returns. Idempotent: every write is an upsert.
+Run from the repository root after connectivity returns:
 
-    uv run python -m scripts.sync_mongo
+    uv run --directory backend python -m scripts.sync_mongo
+
+Writes are idempotent because rounds and packs are upserted by stable IDs.
 """
 
 from __future__ import annotations
@@ -22,23 +22,33 @@ app = typer.Typer(add_completion=False)
 @app.command()
 def main() -> None:
     settings = get_settings()
-    client = db.client()
-    if client is None:
+    status = db.mongo_status(force_probe=True)
+    if not status["configured"]:
         raise typer.BadParameter("MONGODB_URI is not set")
-    client.admin.command("ping")  # fail loudly here rather than per document
+    if not status["reachable"]:
+        typer.echo("MongoDB is unreachable; local data was not changed.", err=True)
+        raise typer.Exit(1)
 
     rounds = sorted((settings.data_path / "rounds").glob("*.json"))
+    confirmed_rounds = 0
     for path in rounds:
-        db.save_result(RoundResult.model_validate_json(path.read_text(encoding="utf-8")))
-    typer.echo(f"rounds: {len(rounds)} upserted")
+        result = RoundResult.model_validate_json(path.read_text(encoding="utf-8"))
+        if not db.save_result(result):
+            typer.echo(f"MongoDB write failed for round {result.round_id}.", err=True)
+            raise typer.Exit(1)
+        confirmed_rounds += 1
+    typer.echo(f"rounds: {confirmed_rounds} upserted")
 
     packs = sorted(settings.scenes_path.glob("*/pack.json"))
+    confirmed_packs = 0
     for path in packs:
         pack = ScenePack.model_validate_json(path.read_text(encoding="utf-8"))
         if not db.save_pack(pack.model_dump(mode="json")):
+            typer.echo(f"MongoDB write failed for scene {pack.scene_id}.", err=True)
             raise typer.Exit(1)
-    typer.echo(f"scene packs: {len(packs)} upserted")
-    typer.echo(f"leaderboard now: {[(e.nickname, e.combined) for e in db.top(limit=5)]}")
+        confirmed_packs += 1
+    typer.echo(f"scene packs: {confirmed_packs} upserted")
+    typer.echo(f"merged leaderboard preview entries: {len(db.top(limit=5))}")
 
 
 if __name__ == "__main__":
