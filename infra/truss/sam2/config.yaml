@@ -1,0 +1,44 @@
+# SAM 2 video segmentation for SceneStealer.
+#
+# Runs ONCE per scene during Scene Prep: give it a clip plus a click or box on
+# the target character in the first frame, get back the character isolated on a
+# dark background, per-frame masks, and which frames are cutaways.
+#
+# Pins are a starting point -- check the Baseten booth for a known-good torch /
+# CUDA combination before burning build minutes on a mismatch.
+
+model_name: scenestealer-sam2
+python_version: py311
+
+requirements:
+  - torch==2.5.1
+  - torchvision==0.20.1
+  - git+https://github.com/facebookresearch/sam2.git
+  - opencv-python-headless==4.10.0.84
+  - numpy<2
+  - pycocotools==2.0.8
+  - huggingface_hub==0.26.2
+
+system_packages:
+  - ffmpeg
+  - libgl1
+  - libglib2.0-0
+
+resources:
+  use_gpu: true
+  # L4 (24GB) is the cheapest card that comfortably fits hiera-large with
+  # CPU offload on. A10G works too. Ask the booth what credits cover.
+  accelerator: L4
+
+# Bakes the weights into the image so cold starts don't re-download ~900MB.
+model_cache:
+  - repo_id: facebook/sam2.1-hiera-large
+    allow_patterns:
+      - "*.pt"
+      - "*.yaml"
+      - "*.json"
+
+runtime:
+  # A 20-40s clip takes ~1-3 min to propagate. Baseten's sync ceiling is 20 min,
+  # so this stays a plain request/response call -- no async or webhooks needed.
+  predict_concurrency: 1

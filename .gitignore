@@ -1,0 +1,48 @@
+# ---- Copyrighted / large media: NEVER commit ----
+assets/private/*
+!assets/private/README.md
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+
+# ---- Generated scene packs (regenerate with `make prep`) ----
+scenes/*/pack.json
+scenes/*/masks/
+scenes/*/isolated.mp4
+scenes/*/frames/
+
+# ---- Round artifacts ----
+data/rounds/
+data/tmp/
+
+# ---- Secrets ----
+.env
+.env.local
+.env.*.local
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+
+# ---- Node ----
+node_modules/
+web/dist/
+.vite/
+*.tsbuildinfo
+
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

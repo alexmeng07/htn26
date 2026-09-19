@@ -1,0 +1,51 @@
+# ============================================================================
+# Scene config template. Copy to scenes/<scene_id>/scene.yaml and fill in.
+#
+# This file, and the pack.json generated from it, are the ONLY places a movie,
+# character, actor, line, timestamp or file name may appear. Swapping scenes =
+# re-run Scene Prep on a new clip + change ACTIVE_SCENE. No code changes.
+#
+# Then:  make prep SCENE=<scene_id>
+# ============================================================================
+
+scene_id: my-scene                  # any slug; must match the folder name
+movie_title: ""
+character_name: ""                  # the target character the player performs
+actor_name: ""                      # used only for the title line
+
+# Keep real movie clips in assets/private/ -- gitignored, demo use only.
+clip_file: assets/private/my-scene/raw.mp4
+start: "00:00:00"                   # one continuous 20-40s shot on the character
+end: "00:00:30"
+
+# Where the target character is in the FIRST frame, for SAM 2 to track.
+# Set one of these; `--pick` in prep/isolate_client.py writes it for you.
+character_select:
+  box: null                         # [x1, y1, x2, y2]
+  point: null                       # [x, y]
+
+briefing: ""                        # ~10s card that sets the moment
+tip: ""                             # what the player should focus on
+title_line: ""                      # e.g. "Can you out-act <actor>?"
+
+# "emotional" = score vocal delivery (reactions, breaths, sobs)
+# "lines"     = score line delivery (words, timing, intonation)
+voice_mode: emotional
+
+# true -> the clip's soundtrack has other characters' voices -> headphones
+# required, so the movie audio doesn't bleed into the player's mic.
+other_voices_in_audio: true
+
+# Per-scene, because scenes differ: a quiet facial scene wants a lower body
+# threshold; an action scene wants a lower face threshold. Tune in playtests
+# for a ~30-50% first-time pass rate. Falls back to DEFAULT_THRESHOLD if unset.
+thresholds:
+  face: 70
+  body: 70
+  voice: 70
+
+# DESIGNS a dub voice from this description. Never clones the real actor's
+# voice, or any real person's voice.
+dub_voice_style: ""
+
+source_note: ""                     # where the clip came from; licensing note

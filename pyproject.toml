@@ -1,0 +1,55 @@
+[project]
+name = "scenestealer"
+version = "0.1.0"
+description = "SceneStealer — out-act the movies. Hack the North 2026."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "python-multipart>=0.0.12",
+    "sse-starlette>=2.1",
+    "httpx>=0.27",
+    "openai>=1.54",
+    "elevenlabs>=1.13",
+    "pymongo>=4.10",
+    "pyyaml>=6.0",
+    "typer>=0.13",
+]
+
+[project.optional-dependencies]
+prep = [
+    "truss>=0.9",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.7",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# FastAPI's Depends/File/Form in argument defaults is the framework's idiom.
+"server/main.py" = ["B008"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["server", "prep"]

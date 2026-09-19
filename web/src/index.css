@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Stage palette. The game lives on a dark AGT-style stage, so the whole app is
+   dark by design rather than theme-switching. */
+@theme {
+  --color-stage-black: #08070c;
+  --color-stage-deep: #12101c;
+  --color-spot: #ffd76f;
+  --color-yes: #3ddc84;
+  --color-no: #ff5470;
+}
+
+html, body, #root { height: 100%; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }

@@ -1,0 +1,33 @@
+# Dev scene: a short, non-copyrighted clip you record yourself (or any
+# public-domain footage). Its job is to prove nothing is hardcoded -- the app
+# must run on this AND on the real scene with no code changes.
+#
+# Record ~20s of someone reacting to something on a laptop, save it as
+# assets/private/dev-clip/raw.mp4, then: make prep SCENE=dev-clip
+
+scene_id: dev-clip
+movie_title: "Dev Clip"
+character_name: "The Subject"
+actor_name: "a teammate"
+clip_file: assets/private/dev-clip/raw.mp4
+start: "00:00:00"
+end: "00:00:20"
+
+character_select:
+  box: null
+  point: null
+
+briefing: "A test scene. Match the subject's expression and posture."
+tip: "This is a smoke test, not a performance. Just mirror what you see."
+title_line: "Can you out-act a teammate?"
+
+voice_mode: emotional
+other_voices_in_audio: false
+
+thresholds:
+  face: 60
+  body: 60
+  voice: 60
+
+dub_voice_style: "warm, neutral, medium pitch"
+source_note: "Self-recorded by the team. No third-party rights."
